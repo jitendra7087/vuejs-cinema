@@ -4,10 +4,18 @@
       <movie-item
         v-for="movie in filteredMovies"
         v-bind:movie="movie.movie"
-        v-bind:sessions="movie.sessions"
-        v-bind:day="day"
-        v-bind:time="time"
-      ></movie-item>
+      >
+      <div class="movie-sessions">
+        <div
+          v-for="session in filteredSessions(movie.sessions)"
+          class="session-time-wrapper tooltip-wrapper"
+          v-tooltip="{seats: session.seats}"
+          v-bind:key="session.id"
+        >
+          <div class="session-time">{{ formatSessionTime(session.time) }}</div>
+        </div>
+      </div>
+      </movie-item>
     </div>
     <div v-else-if="movies.length" class="no-result">
       {{ noResult }}
@@ -56,6 +64,15 @@ export default {
       } else {
         return this.$moment(session.time).hour() < 18;
       }
+    },
+    formatSessionTime(value) {
+      return this.$moment(value).format("h:mm A");
+    },
+    filteredSessions(sessions) {
+      //   return sessions.filter( session => {
+      //       return this.$moment(session.time).isSame(this.day,'day')
+      //   });
+      return sessions.filter(this.sessionPassesTimeFilter);
     },
   },
   computed: {
